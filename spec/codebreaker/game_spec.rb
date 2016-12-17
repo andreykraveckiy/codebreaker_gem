@@ -4,11 +4,11 @@ module Codebreaker
   RSpec.describe Game do
     subject { Game.new }
 
-    describe '#start' do
-      before do
-        subject.start
-      end
+    before do
+      subject.start
+    end
 
+    describe '#start' do
       context 'does with secret code:' do
         let(:secret_code) { subject.instance_variable_get(:@secret_code) }
         it 'generates' do        
@@ -54,10 +54,6 @@ module Codebreaker
     end
 
     describe '#hint' do
-      before do
-        subject.start
-      end
-
       it 'should get any digit from code' do
         expect(subject.instance_variable_get(:@secret_code)).to include(subject.hint)
       end
@@ -73,10 +69,6 @@ module Codebreaker
     end
 
     describe '#submit_guess' do
-      before do
-        subject.start
-      end
-
       it 'should change quantity of guesses' do
         expect { subject.submit_guess('1234') }.to change{ subject.instance_variable_get(:@guesses_quantity) }.by(-1)
       end
@@ -98,8 +90,6 @@ module Codebreaker
           ['1234', '4321', '----'],
           ['1222', '2111', '--'],
           ['1222', '2121', '+--'],
-            ['9876','6789','----'],
-          ['0135','1035','++--'],
           ['2363', '2366', '+++'],
           ['1234', '2345', '---'],
           ['3635', '3333', '++'],
@@ -115,7 +105,6 @@ module Codebreaker
           ['1221','2332','--'],
           ['1222','2431','--'],
           ['1222','2435','-'],
-          ['0135','1035','++--'],
           ['2222','2222','++++'],  
         ].each do |line|
           it "get secret is <#{line.first}>, guess is <#{line[1]}>, should get <#{line.last}>" do
@@ -127,10 +116,6 @@ module Codebreaker
     end
 
     describe '#win?' do
-      before do
-        subject.start
-      end
-
       it 'should return true if it get "++++"' do
         expect(subject.win? '++++').to be_truthy
       end
@@ -143,10 +128,6 @@ module Codebreaker
     end
 
     describe '#lose?' do
-      before do
-        subject.start
-      end
-
       it 'should return true' do
         subject.instance_variable_set(:@guesses_quantity, 0)
         expect(subject.lose? '+++-').to be_truthy
@@ -171,10 +152,6 @@ module Codebreaker
     end
 
     describe '#score' do
-      before do
-        subject.start
-      end
-
       it 'should return right string with info' do
         subject.instance_variable_set(:@guesses_quantity, 4)
         subject.instance_variable_set(:@hints_quantity, 1)
