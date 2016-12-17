@@ -24,7 +24,7 @@ module Codebreaker
         end
 
         it 'generate different from game to game' do
-          expect { subject.start }.to change{subject.instance_variable_get(:@secret_code) }
+          expect { subject.start }.to change{ subject.instance_variable_get(:@secret_code) }
         end
       end
 
@@ -50,6 +50,40 @@ module Codebreaker
         it 'get value from constant' do
           expect(hints_quantity).to eq(Codebreaker::QUANTITY_HINTS)
         end
+      end
+    end
+
+    describe '#hint' do
+      before do
+        subject.start
+      end
+
+      it 'should get any digit from code' do
+        expect(subject.instance_variable_get(:@secret_code)).to include(subject.hint)
+      end
+
+      it 'should change quantity of hints' do
+        expect { subject.hint }.to change{ subject.instance_variable_get(:@hints_quantity) }.by(-1)
+      end
+
+      specify 'should return message if quantity of hints is ZERO' do
+        subject.instance_variable_set(:@hints_quantity, 0)
+        expect(subject.hint).to eq('You have used all hints!')
+      end
+    end
+
+    describe '#submit_guess' do
+      before do
+        subject.start
+      end
+
+      it 'should change quantity of guesses' do
+        expect { subject.submit_guess(1234) }.to change{ subject.instance_variable_get(:@guesses_quantity) }.by(-1)
+      end
+
+      it 'should return string equell or less than CODE_CAPACITY'
+      context 'check answers' do
+
       end
     end
   end
