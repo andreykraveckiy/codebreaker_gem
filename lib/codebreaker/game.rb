@@ -1,6 +1,6 @@
 module Codebreaker
   QUANTITY_GUESSES = 7
-  QUANTITY_HINTS = 3
+  QUANTITY_HINTS = 2
   CODE_CAPACITY = 4
   MESSAGE_HINTS_ARE_USED = 'You have used all hints!'
   BEST_GUESS_MARK = '++++'
