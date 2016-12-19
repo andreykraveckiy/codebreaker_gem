@@ -8,6 +8,15 @@ module Codebreaker
       subject.start
     end
 
+    it { should respond_to(:start) }
+    it { should respond_to(:hint) }
+    it { should respond_to(:submit_guess) }
+    it { should respond_to(:win?) }
+    it { should respond_to(:lose?) }
+    it { should respond_to(:score) }
+    it { should respond_to(:guesses_quantity) }
+    it { should respond_to(:hints_quantity) }
+
     describe '#start' do
       context 'does with secret code:' do
         let(:secret_code) { subject.instance_variable_get(:@secret_code) }
@@ -29,7 +38,7 @@ module Codebreaker
       end
 
       context 'does with quantity of guesses:' do
-        let(:guesses_quantity) { subject.instance_variable_get(:@guesses_quantity) }
+        let(:guesses_quantity) { subject.guesses_quantity }
 
         it 'generates' do        
           expect(guesses_quantity).not_to be_nil
@@ -41,7 +50,7 @@ module Codebreaker
       end
 
       context 'does with quantity of hints:' do
-        let(:hints_quantity) { subject.instance_variable_get(:@hints_quantity) }
+        let(:hints_quantity) { subject.hints_quantity }
 
         it 'generates' do        
           expect(hints_quantity).not_to be_nil
@@ -59,7 +68,7 @@ module Codebreaker
       end
 
       it 'should change quantity of hints' do
-        expect { subject.hint }.to change{ subject.instance_variable_get(:@hints_quantity) }.by(-1)
+        expect { subject.hint }.to change(subject, :hints_quantity).by(-1)
       end
 
       specify 'should return message if quantity of hints is ZERO' do
@@ -70,7 +79,7 @@ module Codebreaker
 
     describe '#submit_guess' do
       it 'should change quantity of guesses' do
-        expect { subject.submit_guess('1234') }.to change{ subject.instance_variable_get(:@guesses_quantity) }.by(-1)
+        expect { subject.submit_guess('1234') }.to change(subject, :guesses_quantity).by(-1)
       end
 
       context 'check answers' do

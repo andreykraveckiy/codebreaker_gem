@@ -6,8 +6,10 @@ module Codebreaker
   BEST_GUESS_MARK = '++++'
   SCORE_TEMPLATE = 'secret is _s | attemts is _a | hints are used _h'
   class Game
-    def initialize
-    end
+    # I didn't use initialize. If I'd used it as start it should have made stack overflow.
+    # The satrt method is more careful for my application than initialize.
+
+    attr_reader :guesses_quantity, :hints_quantity
 
     def start
       @secret_code = generate_secret
