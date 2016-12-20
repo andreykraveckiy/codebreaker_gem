@@ -4,7 +4,7 @@ module Codebreaker
   CODE_CAPACITY = 4
   MESSAGE_HINTS_ARE_USED = 'You have used all hints!'
   BEST_GUESS_MARK = '++++'
-  SCORE_TEMPLATE = 'secret is _s | attemts is _a | hints are used _h'
+  WARNING_SCORE = 'COMPLETE the game before see your result!'
   class Game
     # I didn't use initialize. If I'd used it as start it should have made stack overflow.
     # The satrt method is more careful for my application than initialize.
@@ -41,9 +41,15 @@ module Codebreaker
     end
 
     def score
-      SCORE_TEMPLATE.sub(/_s/, "#{@secret_code}")
-                    .sub(/_a/, "#{QUANTITY_GUESSES - @guesses_quantity}")
-                    .sub(/_h/, "#{QUANTITY_HINTS - @hints_quantity}")
+      if win? || lose?
+        {
+          secret: @secret_code,
+          attempts: QUANTITY_GUESSES - @guesses_quantity,
+          hints: QUANTITY_HINTS - @hints_quantity
+        }
+      else
+        WARNING_SCORE
+      end
     end
 
     private

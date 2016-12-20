@@ -181,10 +181,40 @@ module Codebreaker
     end
 
     describe '#score' do
-      it 'should return right string with info' do
-        subject.instance_variable_set(:@guesses_quantity, 4)
+      context 'should return hash with info if game is won' do
+        let(:won_hash) do 
+          { secret: subject.instance_variable_get(:@secret_code),
+            attempts: Codebreaker::QUANTITY_GUESSES - 4,
+            hints: Codebreaker::QUANTITY_HINTS - 1 }  
+        end
+        before do
+          subject.instance_variable_set(:@guesses_quantity, 4)
+          subject.instance_variable_set(:@hints_quantity, 1)
+          subject.instance_variable_set(:@mark_guess, '++++')
+        end
+        specify { expect(subject.score).to be_a(Hash) }
+        specify { expect(subject.score).to eq won_hash }
+      end
+
+      context 'should return hash with info if game is lost' do
+        let(:lose_hash) do 
+          { secret: subject.instance_variable_get(:@secret_code),
+            attempts: Codebreaker::QUANTITY_GUESSES - 0,
+            hints: Codebreaker::QUANTITY_HINTS - 1 }  
+        end
+        before do
+          subject.instance_variable_set(:@guesses_quantity, 0)
+          subject.instance_variable_set(:@hints_quantity, 1)
+          subject.instance_variable_set(:@mark_guess, '')
+        end
+        specify { expect(subject.score).to be_a(Hash) }
+        specify { expect(subject.score).to eq lose_hash }
+      end
+
+      it 'should return warning message if game is not won or lost' do
+        subject.instance_variable_set(:@guesses_quantity, 1)
         subject.instance_variable_set(:@hints_quantity, 1)
-        expect(subject.score).to match(/secret is \d{4} | attemts is 3 | hints are used 2/)
+        expect(subject.score).to match(/^COMPLETE.+before/)
       end
     end
   end
