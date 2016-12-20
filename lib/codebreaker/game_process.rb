@@ -81,11 +81,11 @@ module Codebreaker
 
       def guess_process(guess)
         unswer = @game.submit_guess(guess)
-        if @game.lose?(unswer)
+        if @game.lose?
           unswer += "\nYOU LOSE !" 
           @state = STATES[2]
         end
-        if @game.win?(unswer)
+        if @game.win?
           unswer += "\nYOU WIN !"  
           @state = STATES[2]
         end
