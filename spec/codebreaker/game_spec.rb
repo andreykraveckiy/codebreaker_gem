@@ -60,6 +60,10 @@ module Codebreaker
           expect(hints_quantity).to eq(Codebreaker::QUANTITY_HINTS)
         end
       end
+
+      context 'does with guesst\'s mark' do
+        it { expect(subject.instance_variable_get(:@mark_guess)).to be_nil }
+      end
     end
 
     describe '#hint' do
@@ -125,37 +129,53 @@ module Codebreaker
     end
 
     describe '#win?' do
-      it 'should return true if it get "++++"' do
-        expect(subject.win? '++++').to be_truthy
+      it 'should return true if previous guess was success' do
+        subject.instance_variable_set(:@mark_guess, '++++')
+        expect(subject.win?).to be_truthy
       end
 
-      it 'should be false if it get any string except "++++"' do
-        expect(subject.win? '+++-').to be_falsey
-        expect(subject.win? '----').to be_falsey
-        expect(subject.win? 'Some string').to be_falsey
+      describe 'should be false if previous guess was not success' do
+        specify do 
+          subject.instance_variable_set(:@mark_guess, '+++-')
+          expect(subject.win?).to be_falsey
+        end
+
+        specify do
+          subject.instance_variable_set(:@mark_guess, '----')
+          expect(subject.win?).to be_falsey
+        end
+
+        specify do
+          subject.instance_variable_set(:@mark_guess, nil)
+          expect(subject.win?).to be_falsey
+        end
       end
     end
 
     describe '#lose?' do
-      it 'should return true' do
+      it 'should return true if guess quantity is 0 and guess mark is not "++++"' do
         subject.instance_variable_set(:@guesses_quantity, 0)
-        expect(subject.lose? '+++-').to be_truthy
+        subject.instance_variable_set(:@mark_guess, '+++-')
+        expect(subject.lose?).to be_truthy
       end
 
       context 'should return false' do
         specify 'guesses quantity is 0 and answer is "++++"' do
           subject.instance_variable_set(:@guesses_quantity, 0)
-          expect(subject.lose? '++++').to be_falsey
+          subject.instance_variable_set(:@mark_guess, '++++')
+          expect(subject.lose?).to be_falsey
         end
 
         specify 'guesses quantity grate than 0 and answer is "++++"' do
           subject.instance_variable_set(:@guesses_quantity, 4)
-          expect(subject.lose? '++++').to be_falsey
+          subject.instance_variable_set(:@mark_guess, '++++')
+          expect(subject.lose?).to be_falsey
         end
 
         specify 'guesses quantity grate than 0 and answer is "++-"' do
           subject.instance_variable_set(:@guesses_quantity, 4)
-          expect(subject.lose? '++-').to be_falsey
+          subject.instance_variable_set(:@mark_guess, '++-')
+          expect(subject.lose?).to be_falsey
         end
       end
     end

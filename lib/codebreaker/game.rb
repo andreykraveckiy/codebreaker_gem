@@ -15,6 +15,7 @@ module Codebreaker
       @secret_code = generate_secret
       @guesses_quantity = QUANTITY_GUESSES
       @hints_quantity = QUANTITY_HINTS
+      @mark_guess = nil
     end
 
     def hint
@@ -28,15 +29,15 @@ module Codebreaker
 
     def submit_guess(guess)
       @guesses_quantity -= 1 
-      check_guess(guess.chars)
+      @mark_guess = check_guess(guess.chars)
     end
 
-    def win?(pluses_minuses)
-      pluses_minuses == BEST_GUESS_MARK
+    def win?
+      @mark_guess == BEST_GUESS_MARK
     end
 
-    def lose?(pluses_minuses)
-      pluses_minuses != BEST_GUESS_MARK && @guesses_quantity == 0
+    def lose?
+      @mark_guess != BEST_GUESS_MARK && @guesses_quantity == 0
     end
 
     def score
