@@ -1,93 +1,123 @@
 require "codebreaker/game"
 
 module Codebreaker
+  CODE_REGEXP = /^[1-6]{4}$/
   class GameProcess
-    MENU_CHOISES = [
-      'new game',
-      'scores'      
-    ]
-    MESSAGE_FOR_UNDEFINED_OPTION = %{
-      Codebreaker can't work with command: _option_!
-      Please type one from the next: _commands_!
+    
+    STAGES_CHANGE = {
+      menu: {
+        "new game" => :game,
+        "scores" => :scores,
+        "exit" => :exit
+      }, 
+      game: {
+        "win" => :show_score,
+        "lost" => :show_score,
+        "new game" => :game
+      },      
+      complete_game: {
+        "yes" => :repeate,
+        "no" => :repeate
+      },
+      repeate: {
+        "yes" => :game,
+        "no" => :menu
+      },
+      scores: {
+        "back" => :menu
+      }
     }
-    GAME_CHOISES = [
-      'hint',
-      /^[1-6]{4}$/,
-      'new game'
-    ]
-    STATES = [:menu, :game, :final_question]
 
     def initialize
       @game = Game.new
-      @state = STATES[0]
+      @stage = :menu
     end 
 
     def menu(choise)
       case choise
-      when MENU_CHOISES[0]
+      when 'new game'
         start_game
-      #when MENU_CHOISES[1]
-      # show scores
+      when 'scores'
+        'Socres were not implemented yet!'
+      when exit
+        'exit'
       else
-        MESSAGE_FOR_UNDEFINED_OPTION.sub(/_option_/, choise)
-                                    .sub(/_commands_/, MENU_CHOISES.to_s)
+        %{WARNING! Type only "new game" or "scores".
+        The option <#{choise}> is not allowed!}
       end
     end
 
     def game(choise)
       case choise
-      when GAME_CHOISES[0]
+      when 'hint'
         @game.hint
-      when GAME_CHOISES[1]
+      when CODE_REGEXP
         guess_process(choise)
-      when GAME_CHOISES[2]
+      when 'new game'
         start_game
       else
-        MESSAGE_FOR_UNDEFINED_OPTION.sub(/_option_/, choise)
-                                    .sub(/_commands_/, GAME_CHOISES.to_s)
+        %{WARNING! Type only "hint", your guess(4 numbers from 1 to 6) or "new game".
+        The option <#{choise}> is not allowed!}
       end
     end
 
-    def final_question(choise)
+    def repeate(choise)
       case choise
       when 'yes'
         start_game
       when 'no'
-        'exit'
+        'menu'
       else
-        'Type "yes" or "no", please'
+        %{WARNING! Type "yes" or "no".
+        The option <#{choise}> is not allowed!}
       end
     end
 
-    def current_guess
+    def remaining_guess
       @game.guesses_quantity
     end
 
-    def current_hint
+    def remaining_hint
       @game.hints_quantity
     end
 
-    def bottleneck(choise)
-      send(@state, choise)
+    def listens_and_shows(choise)
+      @answer = send(@stage, choise)
+      if @stage_changes
+        @stage_changes = false
+        @stage
+      else
+        nil
+      end
+    end
+
+    def answers
+      @answer
     end
 
     private
 
+      def change_stage(option)
+        unless STAGES_CHANGE[@stage][option].nil?
+          @stage = STAGES_CHANGE[@stage][option]
+          @stage_changes = true
+        end
+      end
+
       def start_game
         @game.start
-        @state = STATES[1]
-        'Game is started. Use commands "hint", "new game" or write your code.'
+        @answer = 'Game is started.'
       end
 
       def guess_process(guess)
         unswer = @game.submit_guess(guess)
         if @game.lose?
           unswer += "\nYOU LOSE !" 
-          @state = STATES[2]
+          @stage = STATES[2]
         end
         if @game.win?
           unswer += "\nYOU WIN !"  
-          @state = STATES[2]
+          @stage = STATES[2]
         end
         unswer
       end

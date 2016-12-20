@@ -6,9 +6,47 @@ module Codebreaker
 
     specify { expect(subject).not_to be_nil }
     specify { expect(subject.instance_variable_get(:@game)).not_to be_nil }
-    it { should respond_to(:menu) }
-    it { should respond_to(:game) }
+    it { should_not respond_to(:menu) }
+    it { should_not respond_to(:game) }
+    it { should respond_to(:remaining_guess) }
+    it { should respond_to(:remaining_hint) }
+    it { should respond_to(:listens_and_shows) }
+    it { should respond_to(:answers) }
 
+    describe "test stages of game" do       
+      specify { expect(GameProcess::STAGES_CHANGE).to be_a(Hash) }
+      #allow(subject).to receive(:change_stage)
+      [
+        [:menu, "new game",           :game, true],
+        [:menu, "scores",           :scores, true],
+        [:menu, "exit",               :exit, true],
+        [:menu, "undefined command", :menu, false],
+        [:game, "win",          :show_score, true],
+        [:game, "lost",         :show_score, true],
+        [:game, "hint",              :game, false],
+        [:game, "1236",              :game, false],
+        [:game, "new game",           :game, true],
+        [:game, "undefined command", :game, false],      
+        [:complete_game, "yes",    :repeate, true],
+        [:complete_game, "no",     :repeate, true],
+        [:complete_game, "undefined command", :complete_game, false],
+        [:repeate, "yes",             :game, true],
+        [:repeate, "no",               :menu,true],
+        [:repeate, "undefined command", :repeate, false],
+        [:scores, "back",             :menu, true],
+        [:scores, "undefined command", :scores, false],
+      ].each do |transition|
+        it "<#{transition[0].to_s}> & '#{transition[1]}' #{transition[-1] ? "draw" : "no redraw"} scene <#{transition[2].to_s}>" do
+          subject.instance_variable_set(:@stage, transition[0])
+          subject.instance_variable_set(:@stage_changes, false)
+          subject.send(:change_stage, transition[1])
+          # allow(subject).to receive(:change_stage)
+          expect(subject.instance_variable_get(:@stage)).to eq transition[-2]
+          expect(subject.instance_variable_get(:@stage_changes)).to eq(transition[-1])
+        end
+      end
+    end
+=begin
     describe '#menu' do
       context 'get command "new game"' do
         before { subject.menu('new game') }
@@ -18,11 +56,11 @@ module Codebreaker
         end
 
         it 'guesses quantity is maximum' do
-          expect(subject.current_guess).to eq Codebreaker::QUANTITY_GUESSES
+          expect(subject.remaining_guess).to eq Codebreaker::QUANTITY_GUESSES
         end
 
         it 'hints quantity is maximum' do
-          expect(subject.current_hint).to eq Codebreaker::QUANTITY_HINTS
+          expect(subject.remaining_hint).to eq Codebreaker::QUANTITY_HINTS
         end
       end
 
@@ -42,11 +80,11 @@ module Codebreaker
         end
 
         it "should reduce hints quantity by 1" do
-          expect { subject.game("hint") }.to change(subject, :current_hint).by(-1)
+          expect { subject.game("hint") }.to change(subject, :remaining_hint).by(-1)
         end
 
         it "should not reduce guesses quantity" do
-          expect { subject.game("hint") }.not_to change(subject, :current_guess)
+          expect { subject.game("hint") }.not_to change(subject, :remaining_guess)
         end
 
         it "should return a warning message" do
@@ -123,21 +161,21 @@ module Codebreaker
         expect(subject.final_question('lorem ipsum')).to match(/Type "yes" or "no"/)
       end
     end
-
-    describe '#bottleneck' do
+=end
+    describe '#listens_and_shows' do
       it 'should call #menu with option "new game"' do
         subject.instance_variable_set(:@state, :menu)
-        expect(subject.bottleneck("new game")).to match(/Game is started/)
+        expect(subject.listens_and_shows("new game")).to match(/Game is started/)
       end
 
       it 'should call #game with option "hint"' do
-        subject.bottleneck("new game")
-        expect(%w(1 2 3 4 5 6)).to include(subject.bottleneck("hint"))
+        subject.listens_and_shows("new game")
+        expect(%w(1 2 3 4 5 6)).to include(subject.listens_and_shows("hint"))
       end
 
       it 'should call #final_question wuth option "no"' do
         subject.instance_variable_set(:@state, :final_question)
-        expect(subject.bottleneck("no")).to eq("exit")
+        expect(subject.listens_and_shows("no")).to eq("exit")
       end
     end
   end
