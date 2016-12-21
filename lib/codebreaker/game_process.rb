@@ -38,11 +38,11 @@ module Codebreaker
     end     
 
     def remaining_guess
-      @game.guesses_quantity
+      @game.guesses_quantity if @stage == :game
     end
 
     def remaining_hint
-      @game.hints_quantity
+      @game.hints_quantity if @stage == :game
     end
 
     def listens_and_shows(choise)

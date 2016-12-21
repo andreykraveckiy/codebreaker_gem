@@ -78,6 +78,16 @@ module Codebreaker
           subject.listens_and_shows('bla-bla')
           expect(subject.answers).to match(/WARNING/)
         end
+
+        describe 'remaining_guess and remaining_hint' do
+          specify 'remaining_guess returns nil' do
+            expect(subject.remaining_guess).to be_nil
+          end
+
+          specify 'remaining_hint returns nil' do
+            expect(subject.remaining_hint).to be_nil
+          end
+        end
       end
 
       context 'test #game' do
@@ -96,6 +106,16 @@ module Codebreaker
           expect(subject.listens_and_shows("1325")).to be_nil
           expect(subject.listens_and_shows("1326")).to be_nil
           expect(subject.listens_and_shows("1324")).to eq :save_score
+        end
+
+        describe 'remaining_guess and remaining_hint' do
+          specify 'remaining_guess returns 7' do
+            expect(subject.remaining_guess).to eq Codebreaker::QUANTITY_GUESSES
+          end
+
+          specify 'remaining_hint returns 2' do
+            expect(subject.remaining_hint).to eq Codebreaker::QUANTITY_HINTS
+          end
         end
 
         describe 'option: hint' do
@@ -200,6 +220,16 @@ module Codebreaker
         it 'should get warning message' do
           subject.listens_and_shows('bla-bla')
           expect(subject.answers).to match(/WARNING/)
+        end
+
+        describe 'remaining_guess and remaining_hint' do
+          specify 'remaining_guess returns nil' do
+            expect(subject.remaining_guess).to be_nil
+          end
+
+          specify 'remaining_hint returns nil' do
+            expect(subject.remaining_hint).to be_nil
+          end
         end
       end
 

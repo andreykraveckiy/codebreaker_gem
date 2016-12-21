@@ -5,3 +5,18 @@
   :result: WIN
   :name: andrey kraveckiy
   :time: 2016-12-21 04:27:36.585464638 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-21 13:48:47.090801712 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-21 13:49:36.348908676 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-21 13:50:01.570673944 +02:00
