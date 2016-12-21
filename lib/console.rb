@@ -39,11 +39,11 @@ module Codebreaker
         %{
           Type: 'hint' to see hint;         
                 your guess - 4 with numbers from 1 to 6;
-                'new game' for brestart.
+                'restart' for restart.
         }
       when :scores
         %{
-          There are achievments of COdebreaker.
+          There are achievments of Codebreaker.
           Type 'back' to back in main menu.
         }
       when :complete_game
@@ -52,7 +52,7 @@ module Codebreaker
         }
       when :save_score
         %{
-          Input your name.
+          Input your name for saving.
         }
       when :repete
         %{

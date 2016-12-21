@@ -21,11 +21,11 @@ module Codebreaker
         [:menu, "scores",           :scores, true],
         [:menu, "exit",               :exit, true],
         [:menu, "undefined command", :menu, false],
-        [:game, "win",          :show_score, true],
-        [:game, "lost",         :show_score, true],
+        [:game, "win",          :save_score, true],
+        [:game, "lose",         :save_score, true],
         [:game, "hint",              :game, false],
         [:game, "1236",              :game, false],
-        [:game, "new game",           :game, true],
+        [:game, "restart",           :game, true],
         [:game, "undefined command", :game, false],      
         [:complete_game, "yes", :save_score, true],
         [:complete_game, "no",     :repeate, true],
@@ -84,6 +84,18 @@ module Codebreaker
         before do
           subject.instance_variable_set(:@stage, :menu)
           subject.listens_and_shows("new game")
+        end
+
+        it 'emulate lose' do
+          subject.instance_variable_set(:@stage, :menu)
+          expect(subject.listens_and_shows("new game")).to eq :game
+          expect(subject.listens_and_shows("1324")).to be_nil
+          expect(subject.listens_and_shows("1325")).to be_nil
+          expect(subject.listens_and_shows("1326")).to be_nil
+          expect(subject.listens_and_shows("1324")).to be_nil
+          expect(subject.listens_and_shows("1325")).to be_nil
+          expect(subject.listens_and_shows("1326")).to be_nil
+          expect(subject.listens_and_shows("1324")).to eq :save_score
         end
 
         describe 'option: hint' do
@@ -226,6 +238,11 @@ module Codebreaker
 
         it 'should get menu' do
           expect(subject.listens_and_shows('back')).to eq :menu
+        end
+
+        it 'should show warning' do
+          subject.listens_and_shows('not back')
+          expect(subject.answers).to match(/WARNING/)
         end
       end
     end

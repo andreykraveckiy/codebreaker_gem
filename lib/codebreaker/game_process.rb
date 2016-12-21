@@ -13,9 +13,9 @@ module Codebreaker
         "exit" => :exit
       }, 
       game: {
-        "win" => :show_score,
-        "lost" => :show_score,
-        "new game" => :game
+        "win" => :save_score,
+        "lose" => :save_score,
+        "restart" => :game
       },      
       complete_game: {
         "yes" => :save_score,
@@ -47,7 +47,7 @@ module Codebreaker
 
     def listens_and_shows(choise)
       @answer = send(@stage, choise)
-      change_stage(choise)
+      change_stage(choise) unless @stage_changes
       if @stage_changes
         @stage_changes = false
         @stage
@@ -89,7 +89,7 @@ module Codebreaker
           @game.hint
         when CODE_REGEXP
           guess_process(choise)
-        when 'new game'
+        when 'restart'
           start_game
         else
           %{WARNING! Type only "hint", your guess(4 numbers from 1 to 6) or "new game".
@@ -117,7 +117,7 @@ module Codebreaker
       end
 
       def scores(option)
-        unless option != 'back'
+        unless option == 'back'
           %{WARNING! Type only "back".}
         end
       end
@@ -131,7 +131,7 @@ module Codebreaker
         File.open(DB_FILE, "w") do |f|
           f.write(array_to_save.to_yaml)
         end
-        nil
+        'Score saved'
       end
 
       def start_game
