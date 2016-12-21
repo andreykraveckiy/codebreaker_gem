@@ -27,9 +27,12 @@ module Codebreaker
         [:game, "1236",              :game, false],
         [:game, "new game",           :game, true],
         [:game, "undefined command", :game, false],      
-        [:complete_game, "yes",    :repeate, true],
+        [:complete_game, "yes", :save_score, true],
         [:complete_game, "no",     :repeate, true],
         [:complete_game, "undefined command", :complete_game, false],
+        [:save_score, "name",      :repeate, true],
+        [:save_score, "name1",     :repeate, true],
+        [:save_score, "Lorem Ipsum",     :repeate, true],
         [:repeate, "yes",             :game, true],
         [:repeate, "no",               :menu,true],
         [:repeate, "undefined command", :repeate, false],
@@ -46,136 +49,184 @@ module Codebreaker
         end
       end
     end
-=begin
-    describe '#menu' do
-      context 'get command "new game"' do
-        before { subject.menu('new game') }
 
-        it 'should get message about started game' do
-          expect(subject.menu('new game')).to match(/Game is started/)
-        end
-
-        it 'guesses quantity is maximum' do
-          expect(subject.remaining_guess).to eq Codebreaker::QUANTITY_GUESSES
-        end
-
-        it 'hints quantity is maximum' do
-          expect(subject.remaining_hint).to eq Codebreaker::QUANTITY_HINTS
-        end
-      end
-
-      it 'get command "scores"'
-
-      it 'get any another option' do
-        expect(subject.menu('bla-bla')).to match(/Codebreaker can't work with command: bla-bla/)
-      end
-    end
-
-    describe '#game' do
-      before { subject.menu('new game') }
-
-      context 'get command "hint"' do
-        it "should return a value from 1 to 6" do
-          expect(%w(1 2 3 4 5 6)).to include(subject.game("hint"))
-        end
-
-        it "should reduce hints quantity by 1" do
-          expect { subject.game("hint") }.to change(subject, :remaining_hint).by(-1)
-        end
-
-        it "should not reduce guesses quantity" do
-          expect { subject.game("hint") }.not_to change(subject, :remaining_guess)
-        end
-
-        it "should return a warning message" do
-          3.times { subject.game("hint") }
-          expect(subject.game("hint")).to match(/You have used all hints!/)
-        end
-      end
-
-      context 'get right code /[1-6]{4}/' do
-        specify 'result should be a string' do
-          expect(subject.game("1234")).to be_a(String)
-        end
-
-        it 'should reduce guesses quantity' do
-          expect { subject.game("1234") }.to change(subject, :current_guess).by(-1)
-        end
-
-        it 'should not reduce hints quantity' do
-          expect { subject.game("1234") }.not_to change(subject, :current_hint)
-        end
-      end
-
-      context 'get command "new game"' do
-        before { subject.game('new game') }
-
-        it 'should get message about started game' do
-          expect(subject.game('new game')).to match(/Game is started/)
-        end
-
-        it 'guesses quantity is maximum' do
-          expect(subject.current_guess).to eq Codebreaker::QUANTITY_GUESSES
-        end
-
-        it 'hints quantity is maximum' do
-          expect(subject.current_hint).to eq Codebreaker::QUANTITY_HINTS
-        end
-      end
-
-      context 'get invalid value' do
-        it 'get 5-digit number' do
-          expect(subject.game('12345')).to match(/Codebreaker can't work with command: 12345/)
-        end
-
-        it 'get number with 0 or 7,8,9' do
-          expect(subject.game('1023')).to match(/Codebreaker can't work with command: 1023/)
-          expect(subject.game('7856')).to match(/Codebreaker can't work with command: 7856/)
-          expect(subject.game('9654')).to match(/Codebreaker can't work with command: 9654/)
-        end
-
-        it 'get string with extra space' do
-          expect(subject.game('hint ')).to match(/Codebreaker can't work with command: hint /)
-        end
-
-        specify 'not change hints quantity' do
-          expect { subject.game("hint ") }.not_to change(subject, :current_hint)
-        end
-
-        specify 'not change guesses quantity' do
-          expect { subject.game("12345") }.not_to change(subject, :current_guess)
-        end
-      end
-    end
-
-    describe '#final_question' do
-      it 'should create a new game' do
-        expect(subject.final_question('yes')).to match(/Game is started/)
-      end
-
-      it 'should get exit' do
-        expect(subject.final_question('no')).to eq('exit')
-      end
-
-      it 'should unswer about error command' do
-        expect(subject.final_question('lorem ipsum')).to match(/Type "yes" or "no"/)
-      end
-    end
-=end
     describe '#listens_and_shows' do
-      it 'should call #menu with option "new game"' do
-        subject.instance_variable_set(:@state, :menu)
-        expect(subject.listens_and_shows("new game")).to match(/Game is started/)
+      context 'test #menu' do        
+        before { subject.instance_variable_set(:@stage, :menu) }
+
+        specify { expect(subject.listens_and_shows("new game")).to eq(:game) }
+        specify { expect(subject.listens_and_shows("exit")).to eq(:exit) } 
+
+        context 'get command "new game"' do
+          before { subject.listens_and_shows('new game') }
+
+          it 'guesses quantity is maximum' do
+            expect(subject.remaining_guess).to eq Codebreaker::QUANTITY_GUESSES
+          end
+
+          it 'hints quantity is maximum' do
+            expect(subject.remaining_hint).to eq Codebreaker::QUANTITY_HINTS
+          end
+        end
+
+        it 'get command "scores"' do
+          expect(subject.listens_and_shows("scores")).to eq(:scores)
+          expect(subject.answers).to be_a(Array)
+        end
+
+        it 'get any another option' do
+          subject.listens_and_shows('bla-bla')
+          expect(subject.answers).to match(/WARNING/)
+        end
       end
 
-      it 'should call #game with option "hint"' do
-        subject.listens_and_shows("new game")
-        expect(%w(1 2 3 4 5 6)).to include(subject.listens_and_shows("hint"))
+      context 'test #game' do
+        before do
+          subject.instance_variable_set(:@stage, :menu)
+          subject.listens_and_shows("new game")
+        end
+
+        describe 'option: hint' do
+          before { subject.listens_and_shows("hint") }
+          specify { expect(%w(1 2 3 4 5 6)).to include(subject.answers) }
+
+          it "should reduce hints quantity by 1" do
+            expect { subject.listens_and_shows("hint") }.to change(subject, :remaining_hint).by(-1)
+          end
+
+          it "should not reduce guesses quantity" do
+            expect { subject.listens_and_shows("hint") }.not_to change(subject, :remaining_guess)
+          end
+
+          it "should return a warning message" do
+            3.times { subject.listens_and_shows("hint") }
+            expect(subject.answers).to match(/You have used all hints!/)
+          end
+        end
+
+        context 'get right code /[1-6]{4}/' do
+          specify 'result should be a string' do
+            subject.listens_and_shows("1234")
+            expect(subject.answers).to be_a(String)
+          end
+
+          it 'should reduce guesses quantity' do
+            expect { subject.listens_and_shows("1234") }.to change(subject, :remaining_guess).by(-1)
+          end
+
+          it 'should not reduce hints quantity' do
+            expect { subject.listens_and_shows("1234") }.not_to change(subject, :remaining_hint)
+          end
+        end
+
+        describe 'option: new game' do
+          before { subject.listens_and_shows('new game') }
+
+          it 'guesses quantity is maximum' do
+            expect(subject.remaining_guess).to eq Codebreaker::QUANTITY_GUESSES
+          end
+
+          it 'hints quantity is maximum' do
+            expect(subject.remaining_hint).to eq Codebreaker::QUANTITY_HINTS
+          end
+        end
+
+        describe 'option: undefault options' do
+          it 'get 5-digit number' do
+            subject.listens_and_shows('12345')
+            expect(subject.answers).to match(/WARNING/)
+          end
+
+          it 'get number with 0 or 7,8,9' do
+            subject.listens_and_shows('1023')
+            expect(subject.answers).to match(/<1023>/)
+          end
+
+          it 'get string with extra space' do
+            subject.listens_and_shows('hint ')
+            expect(subject.answers).to match(/<hint >/)
+          end
+
+          specify 'not change hints quantity' do
+            expect { subject.listens_and_shows("hint ") }.not_to change(subject, :remaining_hint)
+          end
+
+          specify 'not change guesses quantity' do
+            expect { subject.listens_and_shows("12345") }.not_to change(subject, :remaining_guess)
+          end
+        end
       end
 
-      it 'should call #final_question wuth option "no"' do
-        subject.instance_variable_set(:@state, :final_question)
-        expect(subject.listens_and_shows("no")).to eq("exit")
+      describe 'test #repeate' do
+        before { subject.instance_variable_set(:@stage, :repeate) }
+
+        it 'should start a new game' do
+          expect(subject.listens_and_shows('yes')).to eq(:game)
+        end
+
+        it 'should return to menu' do
+          expect(subject.listens_and_shows('no')).to eq(:menu)
+        end
+
+        it 'should unswer about error command' do
+          expect(subject.listens_and_shows('lorem ipsum')).to be_nil
+          expect(subject.answers).to match(/WARNING/)
+        end
+      end
+
+      describe 'test #complete_game' do
+        before { subject.instance_variable_set(:@stage, :complete_game) }
+
+        it 'should get input save_score scene' do
+          expect(subject.listens_and_shows('yes')).to eq :save_score
+        end
+
+        it 'should get input repeate scene' do
+          expect(subject.listens_and_shows('no')).to eq :repeate
+        end
+
+        it 'should get warning message' do
+          subject.listens_and_shows('bla-bla')
+          expect(subject.answers).to match(/WARNING/)
+        end
+      end
+
+      describe 'test #save_score' do
+        let(:score_to_save) { {
+            secret: '1234',
+            attempts: 6,
+            hints: 2
+            } }
+        before do
+          subject.instance_variable_set(:@stage, :save_score)
+          subject.instance_variable_set(:@score, score_to_save)
+        end
+
+        it 'should get input repeate scene' do
+          expect(subject.listens_and_shows('New name')).to eq :repeate
+        end
+
+        it 'should get saved hash from file' do
+          hash = subject.send(:scores_from_db).last
+          expect(hash[:secret]).to eq score_to_save[:secret]
+          expect(hash[:attempts]).to eq score_to_save[:attempts]
+          expect(hash[:attempts]).to eq score_to_save[:attempts]
+        end
+      end
+
+      describe 'test #scores' do
+        before do
+          subject.instance_variable_set(:@stage, :menu)
+          subject.listens_and_shows('scores')
+        end
+
+        it 'should have answer as array' do
+          expect(subject.answers).to be_a(Array)
+        end
+
+        it 'should get menu' do
+          expect(subject.listens_and_shows('back')).to eq :menu
+        end
       end
     end
   end

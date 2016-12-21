@@ -1,7 +1,9 @@
 require "codebreaker/game"
+require "yaml"
 
 module Codebreaker
   CODE_REGEXP = /^[1-6]{4}$/
+  DB_FILE = "scores.yaml"
   class GameProcess
     
     STAGES_CHANGE = {
@@ -16,9 +18,10 @@ module Codebreaker
         "new game" => :game
       },      
       complete_game: {
-        "yes" => :repeate,
+        "yes" => :save_score,
         "no" => :repeate
       },
+      save_score: Hash.new(:repeate),
       repeate: {
         "yes" => :game,
         "no" => :menu
@@ -31,47 +34,8 @@ module Codebreaker
     def initialize
       @game = Game.new
       @stage = :menu
-    end 
-
-    def menu(choise)
-      case choise
-      when 'new game'
-        start_game
-      when 'scores'
-        'Socres were not implemented yet!'
-      when exit
-        'exit'
-      else
-        %{WARNING! Type only "new game" or "scores".
-        The option <#{choise}> is not allowed!}
-      end
-    end
-
-    def game(choise)
-      case choise
-      when 'hint'
-        @game.hint
-      when CODE_REGEXP
-        guess_process(choise)
-      when 'new game'
-        start_game
-      else
-        %{WARNING! Type only "hint", your guess(4 numbers from 1 to 6) or "new game".
-        The option <#{choise}> is not allowed!}
-      end
-    end
-
-    def repeate(choise)
-      case choise
-      when 'yes'
-        start_game
-      when 'no'
-        'menu'
-      else
-        %{WARNING! Type "yes" or "no".
-        The option <#{choise}> is not allowed!}
-      end
-    end
+      @stage_changes = false
+    end     
 
     def remaining_guess
       @game.guesses_quantity
@@ -83,6 +47,7 @@ module Codebreaker
 
     def listens_and_shows(choise)
       @answer = send(@stage, choise)
+      change_stage(choise)
       if @stage_changes
         @stage_changes = false
         @stage
@@ -104,21 +69,94 @@ module Codebreaker
         end
       end
 
+      def menu(choise)
+        case choise
+        when 'new game'
+          start_game
+        when 'scores'
+          scores_from_db
+        when 'exit'
+          'exit'
+        else
+          %{WARNING! Type only "new game", "scores" or "exit".
+          The option <#{choise}> is not allowed!}
+        end
+      end
+
+      def game(choise)
+        case choise
+        when 'hint'
+          @game.hint
+        when CODE_REGEXP
+          guess_process(choise)
+        when 'new game'
+          start_game
+        else
+          %{WARNING! Type only "hint", your guess(4 numbers from 1 to 6) or "new game".
+          The option <#{choise}> is not allowed!}
+        end
+      end
+
+      def complete_game(choise)
+        unless choise == 'yes' || choise == 'no'
+          %{WARNING! Type "yes" or "no".
+          The option <#{choise}> is not allowed!}
+        end
+      end
+
+      def repeate(choise)
+        case choise
+        when 'yes'
+          start_game
+        when 'no'
+          'menu'
+        else
+          %{WARNING! Type "yes" or "no".
+          The option <#{choise}> is not allowed!}
+        end
+      end
+
+      def scores(option)
+        unless option != 'back'
+          %{WARNING! Type only "back".}
+        end
+      end
+
+      def save_score(name)
+        @score[:name] = name
+        @score[:time] = Time.now
+        array_to_save = scores_from_db
+        array_to_save << @score
+
+        File.open(DB_FILE, "w") do |f|
+          f.write(array_to_save.to_yaml)
+        end
+        nil
+      end
+
       def start_game
         @game.start
-        @answer = 'Game is started.'
+        ''
+      end
+
+      def scores_from_db
+        YAML.load_file(DB_FILE) || []
       end
 
       def guess_process(guess)
         unswer = @game.submit_guess(guess)
         if @game.lose?
-          unswer += "\nYOU LOSE !" 
-          @stage = STATES[2]
+          @score = @game.score
+          @score[:result] = "LOSE"
+          unswer = @score
+          change_stage("lose")
         end
         if @game.win?
-          unswer += "\nYOU WIN !"  
-          @stage = STATES[2]
-        end
+          @score = @game.score
+          @score[:result] = "WIN" 
+          unswer = @score 
+          change_stage("win")
+        end 
         unswer
       end
   end
