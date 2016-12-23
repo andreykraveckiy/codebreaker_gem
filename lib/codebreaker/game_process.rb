@@ -129,6 +129,7 @@ module Codebreaker
         @score[:time] = Time.now
         array_to_save = scores_from_db
         array_to_save << @score
+        File.new(DB_FILE) unless File.exist?(DB_FILE)
 
         File.open(DB_FILE, "w") do |f|
           f.write(array_to_save.to_yaml)
