@@ -31,6 +31,8 @@ module Codebreaker
       }
     }
 
+    attr_reader :stage
+
     def initialize
       @game = Game.new
       @stage = :menu
