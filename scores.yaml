@@ -20,3 +20,13 @@
   :hints: 2
   :name: New name
   :time: 2016-12-21 13:50:01.570673944 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-23 13:41:44.634168603 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-23 13:42:11.219109213 +02:00

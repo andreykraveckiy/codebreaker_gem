@@ -13,8 +13,8 @@ module Codebreaker
         "exit" => :exit
       }, 
       game: {
-        "win" => :save_score,
-        "lose" => :save_score,
+        "win" => :complete_game,
+        "lose" => :complete_game,
         "restart" => :game
       },      
       complete_game: {

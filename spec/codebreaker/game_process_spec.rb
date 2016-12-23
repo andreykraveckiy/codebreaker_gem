@@ -21,8 +21,8 @@ module Codebreaker
         [:menu, "scores",           :scores, true],
         [:menu, "exit",               :exit, true],
         [:menu, "undefined command", :menu, false],
-        [:game, "win",          :save_score, true],
-        [:game, "lose",         :save_score, true],
+        [:game, "win",          :complete_game, true],
+        [:game, "lose",         :complete_game, true],
         [:game, "hint",              :game, false],
         [:game, "1236",              :game, false],
         [:game, "restart",           :game, true],
@@ -105,7 +105,7 @@ module Codebreaker
           expect(subject.listens_and_shows("1324")).to be_nil
           expect(subject.listens_and_shows("1325")).to be_nil
           expect(subject.listens_and_shows("1326")).to be_nil
-          expect(subject.listens_and_shows("1324")).to eq :save_score
+          expect(subject.listens_and_shows("1324")).to eq :complete_game
         end
 
         describe 'remaining_guess and remaining_hint' do
