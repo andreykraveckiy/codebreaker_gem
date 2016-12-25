@@ -3,6 +3,7 @@ require 'codebreaker'
 
 module Codebreaker
   class Console
+    MESSAGES_FILE = './lib/codebreaker/messages.yaml'
     def self.run
       puts %{
         Welcome to the codebreaker!
@@ -30,37 +31,24 @@ module Codebreaker
     def self.generate_template(template)
       case template
       when :menu
-        %{
-          Type: 'new game' for begining;
-                'scores' to see achieemnts;
-                'exit' for exit.
-        }
+        load_messages[:menu]
       when :game
-        %{
-          Type: 'hint' to see hint;         
-                your guess - 4 with numbers from 1 to 6;
-                'restart' for restart.
-        }
+        load_messages[:game]
       when :scores
-        %{
-          There are achievments of Codebreaker.
-          Type 'back' to back in main menu.
-        }
+        load_messages[:scores]
       when :complete_game
-        %{
-          Wold you like to save your score?(yes/no)
-        }
+        load_messages[:complete_game]
       when :save_score
-        %{
-          Input your name for saving.
-        }
-      when :repete
-        %{
-          Would you like to play again?(yes/no)
-        }
+        load_messages[:save_score]
+      when :repeate
+        load_messages[:repeate]
       when :exit
         exit
       end
+    end
+
+    def self.load_messages
+      YAML.load_file(MESSAGES_FILE)
     end
   end
 end

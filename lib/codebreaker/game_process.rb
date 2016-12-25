@@ -31,7 +31,7 @@ module Codebreaker
       }
     }
 
-    attr_reader :stage
+    attr_reader :stage, :answers
 
     def initialize
       @game = Game.new
@@ -48,27 +48,19 @@ module Codebreaker
     end
 
     def listens_and_shows(choise)
-      @answer = send(@stage, choise)
+      @answers = send(@stage, choise)
       change_stage(choise) unless @stage_changes
-      if @stage_changes
+      return unless @stage_changes
         @stage_changes = false
         @stage
-      else
-        nil
-      end
-    end
-
-    def answers
-      @answer
     end
 
     private
 
       def change_stage(option)
-        unless STAGES_CHANGE[@stage][option].nil?
-          @stage = STAGES_CHANGE[@stage][option]
-          @stage_changes = true
-        end
+        return if STAGES_CHANGE[@stage][option].nil?
+        @stage = STAGES_CHANGE[@stage][option]
+        @stage_changes = true
       end
 
       def menu(choise)
@@ -100,10 +92,9 @@ module Codebreaker
       end
 
       def complete_game(choise)
-        unless choise == 'yes' || choise == 'no'
-          %{WARNING! Type "yes" or "no".
-          The option <#{choise}> is not allowed!}
-        end
+        return if choise == 'yes' || choise == 'no'
+        %{WARNING! Type "yes" or "no".
+        The option <#{choise}> is not allowed!}
       end
 
       def repeate(choise)
@@ -119,9 +110,8 @@ module Codebreaker
       end
 
       def scores(option)
-        unless option == 'back'
-          %{WARNING! Type only "back".}
-        end
+        return if option == 'back'
+        %{WARNING! Type only "back".}
       end
 
       def save_score(name)
@@ -149,18 +139,19 @@ module Codebreaker
       def guess_process(guess)
         unswer = @game.submit_guess(guess)
         if @game.lose?
-          @score = @game.score
-          @score[:result] = "LOSE"
-          unswer = @score
-          change_stage("lose")
+          end_game("lose")
         end
         if @game.win?
-          @score = @game.score
-          @score[:result] = "WIN" 
-          unswer = @score 
-          change_stage("win")
+          end_game("win")
         end 
         unswer
+      end
+
+      def end_game(status)
+        @score = @game.score
+        @score[:result] = status.upcase 
+        unswer = @score 
+        change_stage(status.downcase)
       end
   end
 end

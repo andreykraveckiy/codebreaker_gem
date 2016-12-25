@@ -78,14 +78,9 @@ module Codebreaker
       def delete_false_minuses(answer_and_guess)
         answer, guess = answer_and_guess
         answer.each_index do |index|
-          if answer[index] == '-'
-            in_guess_index = guess.index(@secret_code[index])
-            if in_guess_index
-              guess[in_guess_index] = nil
-            else
-              answer[index] = nil
-            end
-          end
+          next unless answer[index] == '-'
+          in_guess_index = guess.index(@secret_code[index])
+          in_guess_index ? guess[in_guess_index] = nil : answer[index] = nil 
         end
         answer
       end
