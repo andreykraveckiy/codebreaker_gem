@@ -40,4 +40,9 @@
   :hints: 2
   :name: New name
   :time: 2016-12-23 14:03:32.497225677 +02:00
-  
+- :secret: '3424'
+  :attempts: 7
+  :hints: 0
+  :result: LOSE
+  :name: andrey
+  :time: 2016-12-28 01:13:03.655624416 +02:00

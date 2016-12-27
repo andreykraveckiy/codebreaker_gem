@@ -40,11 +40,11 @@ module Codebreaker
     end     
 
     def remaining_guess
-      @game.guesses_quantity if @stage == :game
+      @game.guesses_quantity if in_game?
     end
 
     def remaining_hint
-      @game.hints_quantity if @stage == :game
+      @game.hints_quantity if in_game?
     end
 
     def listens_and_shows(choise)
@@ -128,7 +128,6 @@ module Codebreaker
 
       def start_game
         @game.start
-        ''
       end
 
       def scores_from_db        
@@ -137,21 +136,21 @@ module Codebreaker
       end
 
       def guess_process(guess)
-        unswer = @game.submit_guess(guess)
-        if @game.lose?
-          end_game("lose")
-        end
-        if @game.win?
-          end_game("win")
-        end 
-        unswer
+        answer = @game.submit_guess(guess)
+        answer = end_game("lose") if @game.lose?
+        answer = end_game("win") if @game.win?
+        answer
       end
 
       def end_game(status)
         @score = @game.score
-        @score[:result] = status.upcase 
-        unswer = @score 
+        @score[:result] = status.upcase          
         change_stage(status.downcase)
+        @score
+      end
+
+      def in_game?
+        @stage == :game
       end
   end
 end

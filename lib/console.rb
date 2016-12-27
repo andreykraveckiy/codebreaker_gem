@@ -22,6 +22,7 @@ module Codebreaker
         if respond.is_a?(Symbol)
           puts generate_template(respond)
           game.answers.each { |score| puts score } if respond == :scores
+          puts game.answers if respond == :complete_game
         else
           puts game.answers
         end
