@@ -31,7 +31,7 @@ module Codebreaker
       }
     }
 
-    attr_reader :stage, :answers
+    attr_reader :stage, :answers, :score
 
     def initialize
       @game = Game.new
