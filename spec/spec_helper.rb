@@ -1,4 +1,4 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require 'bundler/setup'
 require 'rspec/collection_matchers'
-require "codebreaker"
+require 'codebreaker'

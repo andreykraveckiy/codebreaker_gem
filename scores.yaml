@@ -1,0 +1,48 @@
+---
+- :secret: '6115'
+  :attempts: 4
+  :hints: 1
+  :result: WIN
+  :name: andrey kraveckiy
+  :time: 2016-12-21 04:27:36.585464638 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-21 13:48:47.090801712 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-21 13:49:36.348908676 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-21 13:50:01.570673944 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-23 13:41:44.634168603 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-23 13:42:11.219109213 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-23 13:51:51.775305062 +02:00
+- :secret: '1234'
+  :attempts: 6
+  :hints: 2
+  :name: New name
+  :time: 2016-12-23 14:03:32.497225677 +02:00
+- :secret: '3424'
+  :attempts: 7
+  :hints: 0
+  :result: LOSE
+  :name: andrey
+  :time: 2016-12-28 01:13:03.655624416 +02:00
